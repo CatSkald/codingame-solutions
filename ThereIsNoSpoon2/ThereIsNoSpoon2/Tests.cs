@@ -71,9 +71,9 @@ namespace ThereIsNoSpoon2
             }));
         }
 
-        /* 1 0 1
-         * 0 0 0
-         * 0 0 1
+        /* 1 . 1
+         * . . .
+         * . . 1
          */
         [Test]
         public void ReturnsMultipleLinksForThreeNodes()
@@ -107,9 +107,9 @@ namespace ThereIsNoSpoon2
             Assert.That(result, Is.Empty);
         }
 
-        /* 0 1 0
+        /* . 1 .
          * 1 4 1
-         * 0 1 0
+         * . 1 .
          */
         [Test]
         public void ReturnsMultipleLinksForCross()
@@ -130,6 +130,32 @@ namespace ThereIsNoSpoon2
                 "0 1 1 1 1",
                 "1 1 2 1 1",
                 "1 1 1 2 1",
+            }));
+        }
+
+        /* 1 . 3
+         * . . .
+         * 1 2 3
+         */
+        [Test]
+        public void CodingameTestCase3()
+        {
+            var calc = new LinksCalculator();
+            var input = new int[3, 3];
+            input[0, 0] = 1;
+            input[2, 0] = 3;
+            input[0, 2] = 1;
+            input[1, 2] = 2;
+            input[2, 2] = 3;
+
+            var result = calc.Calculate(input);
+
+            Assert.That(result, Is.EquivalentTo(new[]
+            {
+                "0 0 2 0 1",
+                "0 2 1 2 1",
+                "1 2 2 2 1",
+                "2 0 2 2 2",
             }));
         }
     }

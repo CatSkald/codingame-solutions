@@ -41,18 +41,16 @@ class Player
         {
             var result = new List<string>();
             var links = new List<Link>();
-            for (int y = 0; y < grid.GetLength(0); y++)
+            for (int y = 0; y < grid.GetLength(1); y++)
             {
-                for (int x = 0; x < grid.GetLength(1); x++)
+                for (int x = 0; x < grid.GetLength(0); x++)
                 {
                     var cell = grid[x, y];
                     if (cell == 0)
-                    {
                         continue;
-                    }
 
                     var maxNode = links.Where(it => it.X == x || it.Y == y)
-                        .OrderByDescending(it => it.Count)
+                        .OrderBy(it => it.Count == 1 ? int.MaxValue : it.Count)
                         .FirstOrDefault();
                     if (maxNode == null)
                     {
@@ -67,7 +65,7 @@ class Player
                             links.Remove(maxNode);
                             if (maxNode.Count < cell)
                             {
-                                links.Add(new Link(x, y, cell));
+                                links.Add(new Link(x, y, cell - maxNode.Count));
                             }
                         }
                         else
@@ -87,7 +85,27 @@ class Player
                         .FirstOrDefault(it => it.X == current.X || it.Y == current.Y);
                     if (end != null)
                     {
-                        result.Add($"{current.ToString()} {end.ToString()} 1");
+                        int count;
+                        if (current.Count <= end.Count)
+                        {
+                            count = current.Count;
+                            links.Remove(current);
+                            if (current.Count == end.Count)
+                            {
+                                links.Remove(end);
+                            }
+                            else
+                            {
+                                end.Count -= current.Count;
+                            }
+                        }
+                        else
+                        {
+                            count = end.Count;
+                            links.Remove(end);
+                            current.Count -= end.Count;
+                        }
+                        result.Add($"{current.ToString()} {end.ToString()} {count}");
                     }
                 }
             }
