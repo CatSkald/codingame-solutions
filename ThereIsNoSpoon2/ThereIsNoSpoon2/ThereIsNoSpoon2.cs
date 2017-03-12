@@ -49,70 +49,65 @@ class Player
                     if (cell == 0)
                         continue;
 
-                    var maxNode = links.Where(it => it.X == x || it.Y == y)
+                    var node = links.Where(it => it.X == x || it.Y == y)
                         .OrderBy(it => it.Count == 1 ? int.MaxValue : it.Count)
                         .FirstOrDefault();
-                    if (maxNode == null)
+                    if (node == null)
                     {
                         links.Add(new Node(x, y, cell));
                         continue;
                     }
                     else
                     {
-                        if (maxNode.Count <= cell)
+                        var min = MinOr2(node.Count, cell);
+                        result.Add(new Link(node.X, node.Y, x, y, min));
+                        node.Count -= min;
+                        cell -= min;
+                        if (node.Count <= 0)
                         {
-                            result.Add(new Link(maxNode.X, maxNode.Y, x, y, maxNode.Count));
-                            links.Remove(maxNode);
-                            if (maxNode.Count < cell)
-                            {
-                                links.Add(new Node(x, y, cell - maxNode.Count));
-                            }
+                            links.Remove(node);
                         }
-                        else
+                        if (cell > 0)
                         {
-                            result.Add(new Link(maxNode.X, maxNode.Y, x, y, cell));
-                            maxNode.Count -= cell;
+                            links.Add(new Node(x, y, cell));
                         }
                     }
                 }
             }
-            if (links.Count > 1)
+            while (links.Any())
             {
-                for (int i = 0; i < links.Count; i++)
+                var current = links.First();
+                var end = links.Skip(1)
+                    .FirstOrDefault(it => it.X == current.X || it.Y == current.Y);
+                if (end != null)
                 {
-                    var current = links[i];
-                    var end = links.Skip(i + 1)
-                        .FirstOrDefault(it => it.X == current.X || it.Y == current.Y);
-                    if (end != null)
+                    var min = MinOr2(current.Count, end.Count);
+                    result.Add(new Link(current.X, current.Y, end.X, end.Y, min));
+                    current.Count -= min;
+                    end.Count -= min;
+                    if (current.Count <= 0)
                     {
-                        int count;
-                        if (current.Count <= end.Count)
-                        {
-                            count = current.Count;
-                            links.Remove(current);
-                            if (current.Count == end.Count)
-                            {
-                                links.Remove(end);
-                            }
-                            else
-                            {
-                                end.Count -= current.Count;
-                            }
-                        }
-                        else
-                        {
-                            count = end.Count;
-                            links.Remove(end);
-                            current.Count -= end.Count;
-                        }
-                        result.Add(new Link(current.X, current.Y, end.X, end.Y, count));
+                        links.Remove(current);
                     }
+                    if (end.Count <= 0)
+                    {
+                        links.Remove(end);
+                    }
+                }
+                else
+                {
+                    links.Remove(current);
                 }
             }
             return result.GroupBy(l => $"{l.X1}{l.Y1}{l.X2}{l.Y2}")
                 .Select(it => Link.CreateWithSum(it.First(), it.Sum(l => l.Count)))
                 .Select(l => l.ToString())
                 .ToList();
+        }
+
+        private int MinOr2(int val1, int val2)
+        {
+            return Math.Min(2, Math.Min(val1, val2));
         }
 
         private class Node
