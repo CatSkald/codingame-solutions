@@ -93,11 +93,25 @@ namespace ThereIsNoSpoon2
             }));
         }
 
+        [TestCase(0, 0, 1, 1)]
+        [TestCase(0, 0, 1, 2)]
+        public void DoesNotReturnLinksForDiagonalNodes(int i1, int j1, int i2, int j2)
+        {
+            var calc = new LinksCalculator();
+            var input = new int[3, 3];
+            input[i1, j1] = 1;
+            input[i2, j2] = 1;
+
+            var result = calc.Calculate(input);
+
+            Assert.That(result, Is.Empty);
+        }
+
         /* 0 1 0
          * 1 4 1
          * 0 1 0
          */
-        [Test, Ignore("Too complex scenario for now")]
+        [Test]
         public void ReturnsMultipleLinksForCross()
         {
             var calc = new LinksCalculator();

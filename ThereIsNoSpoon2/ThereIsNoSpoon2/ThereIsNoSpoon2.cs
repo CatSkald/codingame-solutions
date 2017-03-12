@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /**
  * The machines are gaining ground. Time to show them what we're really made of...
@@ -38,44 +39,78 @@ class Player
     {
         public List<string> Calculate(int[,] grid)
         {
-            string start = null;
-            int startCount = 0;
             var result = new List<string>();
-            for (int i = 0; i < grid.GetLength(0); i++)
+            var links = new List<Link>();
+            for (int y = 0; y < grid.GetLength(0); y++)
             {
-                for (int j = 0; j < grid.GetLength(1); j++)
+                for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    var cell = grid[j, i];
+                    var cell = grid[x, y];
                     if (cell == 0)
                     {
                         continue;
                     }
-                    if (start == null)
+
+                    var maxNode = links.Where(it => it.X == x || it.Y == y)
+                        .OrderByDescending(it => it.Count)
+                        .FirstOrDefault();
+                    if (maxNode == null)
                     {
-                        start = $"{j} {i}";
-                        startCount = cell;
+                        links.Add(new Link(x, y, cell));
+                        continue;
                     }
                     else
                     {
-                        if (startCount <= cell)
+                        if (maxNode.Count <= cell)
                         {
-                            result.Add($"{start} {j} {i} {startCount}");
-                            startCount = cell - startCount;
-                            start = $"{j} {i}";
+                            result.Add($"{maxNode.ToString()} {x} {y} {maxNode.Count}");
+                            links.Remove(maxNode);
+                            if (maxNode.Count < cell)
+                            {
+                                links.Add(new Link(x, y, cell));
+                            }
                         }
                         else
                         {
-                            result.Add($"{start} {j} {i} {cell}");
-                            startCount -= cell;
-                        }
-                        if (startCount == 0)
-                        {
-                            start = null;
+                            result.Add($"{maxNode.ToString()} {x} {y} {cell}");
+                            maxNode.Count -= cell;
                         }
                     }
                 }
             }
+            if (links.Count > 1)
+            {
+                for (int i = 0; i < links.Count; i++)
+                {
+                    var current = links[i];
+                    var end = links.Skip(i + 1)
+                        .FirstOrDefault(it => it.X == current.X || it.Y == current.Y);
+                    if (end != null)
+                    {
+                        result.Add($"{current.ToString()} {end.ToString()} 1");
+                    }
+                }
+            }
             return result;
+        }
+
+        private class Link
+        {
+            public Link(int j, int i, int count)
+            {
+                X = j;
+                Y = i;
+                Count = count;
+            }
+
+            public int X { get; set; }
+            public int Y { get; set; }
+            public int Count { get; set; }
+
+            public override string ToString()
+            {
+                return $"{X} {Y}";
+            }
         }
     }
 }
