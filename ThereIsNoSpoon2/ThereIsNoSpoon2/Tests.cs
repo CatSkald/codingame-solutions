@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using static Player;
 
@@ -73,21 +71,51 @@ namespace ThereIsNoSpoon2
             }));
         }
 
+        /* 1 0 1
+         * 0 0 0
+         * 0 0 1
+         */
         [Test]
         public void ReturnsMultipleLinksForThreeNodes()
         {
             var calc = new LinksCalculator();
-            var input = new int[5, 5];
+            var input = new int[3, 3];
             input[0, 0] = 1;
             input[2, 0] = 2;
-            input[0, 2] = 1;
+            input[2, 2] = 1;
 
             var result = calc.Calculate(input);
 
             Assert.That(result, Is.EquivalentTo(new[]
             {
                 "0 0 2 0 1",
-                "2 0 0 2 1"
+                "2 0 2 2 1"
+            }));
+        }
+
+        /* 0 1 0
+         * 1 4 1
+         * 0 1 0
+         */
+        [Test, Ignore("Too complex scenario for now")]
+        public void ReturnsMultipleLinksForCross()
+        {
+            var calc = new LinksCalculator();
+            var input = new int[3, 3];
+            input[1, 0] = 1;
+            input[0, 1] = 1;
+            input[1, 1] = 4;
+            input[2, 1] = 1;
+            input[1, 2] = 1;
+
+            var result = calc.Calculate(input);
+
+            Assert.That(result, Is.EquivalentTo(new[]
+            {
+                "1 0 1 1 1",
+                "0 1 1 1 1",
+                "1 1 2 1 1",
+                "1 1 1 2 1",
             }));
         }
     }
