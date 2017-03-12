@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using static Player;
 
@@ -85,7 +87,7 @@ namespace ThereIsNoSpoon2
             Assert.That(result, Is.EquivalentTo(new[]
             {
                 "0 0 2 0 1",
-                "0 2 2 0 1"
+                "2 0 0 2 1"
             }));
         }
     }

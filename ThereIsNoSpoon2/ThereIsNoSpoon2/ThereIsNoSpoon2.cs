@@ -57,15 +57,17 @@ class Player
                     }
                     else
                     {
-                        if (startCount == cell)
+                        if (startCount <= cell)
                         {
                             result.Add($"{start} {j} {i} {startCount}");
+                            startCount = cell - startCount;
+                            start = $"{j} {i}";
                         }
                         else
                         {
-                            result.Add($"{start} {j} {i} 1");
+                            result.Add($"{start} {j} {i} {cell}");
+                            startCount -= cell;
                         }
-                        startCount--;
                         if (startCount == 0)
                         {
                             start = null;
