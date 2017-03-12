@@ -53,21 +53,21 @@ namespace ThereIsNoSpoon2
             }));
         }
 
-        [TestCase(0, 0, 0, 1, 2)]
-        [TestCase(1, 2, 4, 2, 4)]
+        [TestCase(0, 0, 0, 1)]
+        [TestCase(1, 2, 4, 2)]
         public void ReturnsMultipleLinksForTwoNodes(
-            int i1, int j1, int i2, int j2, int count)
+            int i1, int j1, int i2, int j2)
         {
             var calc = new LinksCalculator();
             var input = new int[5, 5];
-            input[i1, j1] = count;
-            input[i2, j2] = count;
+            input[i1, j1] = 2;
+            input[i2, j2] = 2;
 
             var result = calc.Calculate(input);
 
             Assert.That(result, Is.EquivalentTo(new[]
             {
-                $"{i1} {j1} {i2} {j2} {count}"
+                $"{i1} {j1} {i2} {j2} 2"
             }));
         }
 
@@ -156,6 +156,50 @@ namespace ThereIsNoSpoon2
                 "0 2 1 2 1",
                 "1 2 2 2 1",
                 "2 0 2 2 2",
+            }));
+        }
+
+        [TestCase(0, 0, 0, 1, 3)]
+        [TestCase(1, 2, 4, 2, 6)]
+        public void ReturnMax2LinksPerNode(
+            int i1, int j1, int i2, int j2, int count)
+        {
+            var calc = new LinksCalculator();
+            var input = new int[5, 5];
+            input[i1, j1] = count;
+            input[i2, j2] = count;
+
+            var result = calc.Calculate(input);
+
+            Assert.That(result, Is.EquivalentTo(new[]
+            {
+                $"{i1} {j1} {i2} {j2} 2"
+            }));
+        }
+
+        /* 1 4 . 3
+         * . . . .
+         * . . . 4
+         */
+        [Test]
+        public void CodingameTestCase4()
+        {
+            var calc = new LinksCalculator();
+            var input = new int[4, 3];
+            input[0, 0] = 1;
+            input[1, 0] = 4;
+            input[3, 0] = 3;
+            input[1, 2] = 4;
+            input[3, 2] = 4;
+
+            var result = calc.Calculate(input);
+
+            Assert.That(result, Is.EquivalentTo(new[]
+            {
+                "0 0 1 0 1",
+                "1 0 3 0 2",
+                "1 2 3 2 2",
+                "1 0 1 2 2"
             }));
         }
     }

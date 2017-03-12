@@ -37,10 +37,10 @@ class Player
 
     public class LinksCalculator
     {
-        public List<string> Calculate(int[,] grid)
+        public IEnumerable<string> Calculate(int[,] grid)
         {
-            var result = new List<string>();
-            var links = new List<Link>();
+            var result = new List<Link>();
+            var links = new List<Node>();
             for (int y = 0; y < grid.GetLength(1); y++)
             {
                 for (int x = 0; x < grid.GetLength(0); x++)
@@ -54,23 +54,23 @@ class Player
                         .FirstOrDefault();
                     if (maxNode == null)
                     {
-                        links.Add(new Link(x, y, cell));
+                        links.Add(new Node(x, y, cell));
                         continue;
                     }
                     else
                     {
                         if (maxNode.Count <= cell)
                         {
-                            result.Add($"{maxNode.ToString()} {x} {y} {maxNode.Count}");
+                            result.Add(new Link(maxNode.X, maxNode.Y, x, y, maxNode.Count));
                             links.Remove(maxNode);
                             if (maxNode.Count < cell)
                             {
-                                links.Add(new Link(x, y, cell - maxNode.Count));
+                                links.Add(new Node(x, y, cell - maxNode.Count));
                             }
                         }
                         else
                         {
-                            result.Add($"{maxNode.ToString()} {x} {y} {cell}");
+                            result.Add(new Link(maxNode.X, maxNode.Y, x, y, cell));
                             maxNode.Count -= cell;
                         }
                     }
@@ -105,19 +105,22 @@ class Player
                             links.Remove(end);
                             current.Count -= end.Count;
                         }
-                        result.Add($"{current.ToString()} {end.ToString()} {count}");
+                        result.Add(new Link(current.X, current.Y, end.X, end.Y, count));
                     }
                 }
             }
-            return result;
+            return result.GroupBy(l => $"{l.X1}{l.Y1}{l.X2}{l.Y2}")
+                .Select(it => Link.CreateWithSum(it.First(), it.Sum(l => l.Count)))
+                .Select(l => l.ToString())
+                .ToList();
         }
 
-        private class Link
+        private class Node
         {
-            public Link(int j, int i, int count)
+            public Node(int x, int y, int count)
             {
-                X = j;
-                Y = i;
+                X = x;
+                Y = y;
                 Count = count;
             }
 
@@ -128,6 +131,42 @@ class Player
             public override string ToString()
             {
                 return $"{X} {Y}";
+            }
+        }
+
+        private struct Link
+        {
+            public Link(int x1, int y1, int x2, int y2, int count)
+            {
+                X1 = x1;
+                Y1 = y1;
+                X2 = x2;
+                Y2 = y2;
+                Count = count;
+            }
+
+            public static Link CreateWithSum(Link link, int count)
+            {
+                return new Link
+                {
+                    X1 = link.X1,
+                    Y1 = link.Y1,
+                    X2 = link.X2,
+                    Y2 = link.Y2,
+                    Count = count
+                };
+            }
+
+            public int X1 { get; set; }
+            public int Y1 { get; set; }
+            public int X2 { get; set; }
+            public int Y2 { get; set; }
+            public int Count { get; set; }
+
+            public override string ToString()
+            {
+                var count = Count > 2 ? 2 : Count;
+                return $"{X1} {Y1} {X2} {Y2} {count}";
             }
         }
     }
