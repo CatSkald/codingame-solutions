@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 /**
@@ -77,11 +78,13 @@ class Player
             while (links.Any())
             {
                 var current = links.First();
-                var end = links.Skip(1)
-                    .FirstOrDefault(it => it.X == current.X || it.Y == current.Y);
-                if (end != null)
+                var end = links.Skip(1).FirstOrDefault(it => it.X == current.X || it.Y == current.Y);
+                //TODO prevent from adding more than 2 links in this while loop
+                //var existingCount = result.Where(r => r.X1 == current.X && r.Y1 == current.Y
+                //                && r.X2 == end.X && r.Y2 == end.Y).Sum(r => r.Count);
+                if (end != null) //&& existingCount < 2)
                 {
-                    var min = MinOr2(current.Count, end.Count);
+                    var min = MinOr2(current.Count, end.Count); // Math.Min(end.Count, existingCount));
                     result.Add(new Link(current.X, current.Y, end.X, end.Y, min));
                     current.Count -= min;
                     end.Count -= min;
@@ -99,6 +102,8 @@ class Player
                     links.Remove(current);
                 }
             }
+
+            //TODO optimize
             return result.GroupBy(l => $"{l.X1}{l.Y1}{l.X2}{l.Y2}")
                 .Select(it => Link.CreateWithSum(it.First(), it.Sum(l => l.Count)))
                 .Select(l => l.ToString())
@@ -110,6 +115,7 @@ class Player
             return Math.Min(2, Math.Min(val1, val2));
         }
 
+        [DebuggerDisplay("[{X} {Y}] {Count}")]
         private class Node
         {
             public Node(int x, int y, int count)
@@ -129,6 +135,7 @@ class Player
             }
         }
 
+        [DebuggerDisplay("[{X1} {Y1}] [{X2} {Y2}] {Count}")]
         private struct Link
         {
             public Link(int x1, int y1, int x2, int y2, int count)

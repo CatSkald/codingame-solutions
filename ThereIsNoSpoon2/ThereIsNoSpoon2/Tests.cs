@@ -179,7 +179,7 @@ namespace ThereIsNoSpoon2
 
         /* 1 4 . 3
          * . . . .
-         * . . . 4
+         * . 4 . 4
          */
         [Test]
         public void CodingameTestCase4()
@@ -198,8 +198,9 @@ namespace ThereIsNoSpoon2
             {
                 "0 0 1 0 1",
                 "1 0 3 0 2",
+                "1 0 1 2 2",
                 "1 2 3 2 2",
-                "1 0 1 2 2"
+                "3 0 3 2 2",
             }));
         }
     }
